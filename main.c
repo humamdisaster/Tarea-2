@@ -114,7 +114,7 @@ int main()
     Map *canciones_id = map_create(is_equal_str); //mapa de ID
     Map *canciones_genero = map_create(is_equal_str); //mapa de genero
     Map *canciones_artistas = map_create(is_equal_str); //mapa de artistas
-    //crear un arreglo con tempos lentas, moderadas y rapidas, siendo solo 3.
+    //crear un arreglo con tempos lentas, moderadas y rapidas, siendo solo 3
     //crear una lista de canciones vacia, donde se deba guardar canciones a gusto de uno.
 
     do
