@@ -32,6 +32,8 @@ void mostrarMenu()
     puts("3) Buscar por genero");
     puts("4) Buscar por artista");
     puts("5) Buscar por tempo");
+    puts("6) Agregar a favoritos");
+    puts("7) Mostrar favoritos");
     puts("8) Salir");
 }
 
@@ -181,15 +183,73 @@ void buscar_por_id(TreeMap *canciones_id)
     printf("Tempo: %.2f BPM\n\n", cancion->tempo);
 }
 
+void agregar_favoritos(TreeMap *favoritos, TreeMap *canciones_id)
+{
+    char id[100];
+    char categoria[100];
+
+    printf("Ingresa el ID de la cancion: ");
+    scanf(" %[^\n]", id);
+
+    Pair *par = searchTreeMap(canciones_id, id);
+    if (par == NULL)
+    {
+        printf("No se encontro ninguna cancion con ese ID.\n");
+        return;
+    }
+    musica *cancion = (musica *)par->value;
+    printf("Ingresa la categoria de favoritos: ");
+    scanf(" %[^\n]", categoria);
+    List *lista = (List *)searchTreeMap(favoritos, categoria);
+    if (lista == NULL)
+    {
+        lista = createList();
+        insertTreeMap(favoritos, strdup(categoria), lista);
+    }
+    list_pushBack(lista, cancion);
+    printf("Cancion agregada a favoritos en la categoria: %s\n", categoria);
+}
+
+void mostrar_favoritos(TreeMap *favoritos)
+{
+    Pair *par = firstTreeMap(favoritos);
+    if (par == NULL)
+    {
+        printf("No hay canciones en favoritos.\n");
+        return;
+    }
+    while (par != NULL)
+    {
+        char categoria = (char *)par->key;
+        List *lista = (List *)par->value;
+        printf("Categoria: %s\n", categoria);
+        musica *cancion = list_first(lista);
+
+        while (cancion != NULL)
+        {
+            printf("ID: %s\n", cancion->id);
+            printf("Artista(s): %s\n", cancion->artists);
+            printf("Album: %s\n", cancion->album_name);
+            printf("Nombre de la cancion: %s\n", cancion->track_name);
+            printf("Genero: %s\n", cancion->track_genre);
+            printf("Tempo: %.2f BPM\n", cancion->tempo);
+            cancion = nextList(lista);
+        }
+        par = nextTreeMap(favoritos);
+    }
+    
+}
+
 int main()
 {
     char opcion;
     TreeMap *canciones_id = createTreeMap(lower_than_str); //mapa de ID
     TreeMap *canciones_genero = createTreeMap(lower_than_str); //mapa de genero
     TreeMap *canciones_artistas = createTreeMap(lower_than_str); //mapa de artistas
-    TreeMap *tempo_lentas = createTreeMap(lower_than_float);
-    TreeMap *tempo_Moderadas = createTreeMap(lower_than_float);
-    TreeMap *tempo_rapidas = createTreeMap(lower_than_float);
+    TreeMap *tempo_lentas = createTreeMap(lower_than_float); //mapa de tempo canciones lentas
+    TreeMap *tempo_Moderadas = createTreeMap(lower_than_float); //mapa de tempo canciones moderadas
+    TreeMap *tempo_rapidas = createTreeMap(lower_than_float); //mapa de tempo canciones rapidas
+    TreeMap *favoritos = createTreeMap(lower_than_str); //mapa de favoritos
 
     do
     {
@@ -206,11 +266,27 @@ int main()
             case '2':
                 buscar_por_id(canciones_id);
                 break;
+            case '3':
+                buscar_por_genero(canciones_genero);
+                break;
+            case '4':
+                buscar_por_artista(canciones_artistas);
+                break;
+            case '5':
+                buscar_por_tempo(tempo_lentas, tempo_Moderadas, tempo_rapidas);
+                break;
+            case '6':
+                agregar_favoritos(favoritos, canciones_id);
+                break;
+            case '7':
+                mostrar_favoritos(favoritos);
+                break;
             default:
-                printf("Saliendo...\n");
+                if (opcion != '8') printf("Opcion no valida.\n");
                 break;
         }
     } while(opcion != '8');
+    printf("Saliendo...\n");
 
     return 0;
 }
