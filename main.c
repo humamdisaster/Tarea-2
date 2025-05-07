@@ -148,7 +148,18 @@ void cargar_canciones(TreeMap *canciones_id, TreeMap *canciones_genero, TreeMap 
         //insertar en los otros tres mapas
         insertTreeMap(canciones_id, cancion->id, cancion);
         insertTreeMap(canciones_artistas, cancion->artists, cancion);
-        insertTreeMap(canciones_genero, cancion->track_genre, cancion);
+
+        Pair *par_genero = searchTreeMap(canciones_genero, cancion->track_genre);
+        List *lista_genero = NULL;
+        if (par_genero != NULL)
+            lista_genero = (List *)par_genero->value;
+        if (lista_genero == NULL)
+        {
+            lista_genero = createList();
+            insertTreeMap(canciones_genero, cancion->track_genre, lista_genero);
+        }
+        pushBack(lista_genero, cancion);
+
 
         for (int i = 0; i < n_campos; i++) free(campos[i]);
         free(campos);
@@ -182,6 +193,36 @@ void buscar_por_id(TreeMap *canciones_id)
     printf("Genero: %s\n", cancion->track_genre);
     printf("Tempo: %.2f BPM\n\n", cancion->tempo);
 }
+
+/*void buscar_por_genero(TreeMap *canciones_genero)
+{
+    char genero_buscado[100];
+    printf("Ingrese el genero de la cancion: ");
+    scanf(" %[^\n]", genero_buscado);
+
+    Pair *par = searchTreeMap(canciones_genero, genero_buscado);
+    if (par == NULL)
+    {
+        printf("No se encontro ninguna cancion con ese genero.\n");
+        return;
+    }
+
+    List *lista = (List *)par->value;
+    musica *cancion = firstList(lista);
+
+    printf("\n--- Canciones del genero '%s' ---\n", genero_buscado);
+    while(cancion != NULL)
+    {
+        printf("ID: %s\n", cancion->id);
+        printf("Artista(s): %s\n", cancion->artists);
+        printf("Album: %s\n", cancion->album_name);
+        printf("Nombre de la cancion: %s\n", cancion->track_name);
+        printf("Tempo: %.2f BPM\n\n", cancion->tempo);
+        
+        cancion = nextList(lista);
+        printf("--------------------------\n");
+    }
+}*/
 
 void agregar_favoritos(TreeMap *favoritos, TreeMap *canciones_id)
 {
@@ -266,9 +307,9 @@ int main()
             case '2':
                 buscar_por_id(canciones_id);
                 break;
-            case '3':
+            /*case '3':
                 buscar_por_genero(canciones_genero);
-                break;
+                break;*/
             case '4':
                 buscar_por_artista(canciones_artistas);
                 break;
