@@ -1,29 +1,33 @@
-#ifndef LIST_H
-#define LIST_H
+#ifndef List_h
+#define List_h
 
 typedef struct List List;
 
-// Esta función crea una lista vacía y devuelve un puntero a la lista.
-List *list_create();
+List * createList(void);
 
-// Esta función devuelve un puntero al primer elemento de la lista.
-void *list_first(List *L);
+void * firstList(List * list);
 
-// Esta función mueve el puntero de la lista al siguiente elemento y devuelve un
-// puntero a dicho elemento.
-void *list_next(List *L);
+void * nextList(List * list);
 
-// Esta función inserta un nuevo elemento al inicio de la lista.
-void list_pushFront(List *L, void *dato);
+void * lastList(List * list);
 
-// Esta función inserta un nuevo elemento al final de la lista.
-void list_pushBack(List *L, void *dato);
+void * prevList(List * list);
 
-// Esta función inserta un nuevo elemento a continuación del actual de la lista.
-void list_pushCurrent(List *L, void *dato);
+void pushFront(List * list, void * data);
 
-// Esta función elimina el primer elemento de la lista.
-void *list_popFront(List *L);
+void pushBack(List * list, void * data);
+
+void pushCurrent(List * list, void * data);
+
+void * popFront(List * list);
+
+void * popBack(List * list);
+
+void * popCurrent(List * list);
+
+void cleanList(List * list);
+
+#endif /* List_h */
 
 // Esta función elimina el último elemento de la lista.
 void *list_popBack(List *L);
