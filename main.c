@@ -194,7 +194,7 @@ void buscar_por_id(TreeMap *canciones_id)
     printf("Tempo: %.2f BPM\n\n", cancion->tempo);
 }
 
-/*void buscar_por_genero(TreeMap *canciones_genero)
+void buscar_por_genero(TreeMap *canciones_genero)
 {
     char genero_buscado[100];
     printf("Ingrese el genero de la cancion: ");
@@ -222,7 +222,45 @@ void buscar_por_id(TreeMap *canciones_id)
         cancion = nextList(lista);
         printf("--------------------------\n");
     }
-}*/
+}
+
+void buscar_por_artista(TreeMap *canciones_artistas)
+{
+    char artista_buscado[100];
+    printf("Ingrese el nombre del artista: ");
+    scanf(" %[^\n]", artista_buscado);
+
+    Pair *par = searchTreeMap(canciones_artistas, artista_buscado);
+    if (par == NULL)
+    {
+        printf("No se encontro ninguna cancion de ese artista.\n");
+        return;
+    }
+    musica *cancion = (musica *)par->value;
+    printf("Cancion encontrada: %s - %s\n", cancion->track_name, cancion->album_name);
+}
+
+void buscar_por_tempo(TreeMap *lentas, TreeMap *moderadas, TreeMap *rapidas)
+{
+    printf("Canciones lentas (< 80 BPM):\n");
+    for (Pair *par = firstTreeMap(lentas); par != NULL; par = nextTreeMap(lentas))
+    {
+        musica *cancion = (musica *)par->value;
+        printf("%s - %.2f BPM", cancion->track_name, cancion->tempo);
+    }
+    printf("\n\nCanciones moderadas (80 - 120 BPM):\n");
+    for (Pair *par = firstTreeMap(moderadas); par != NULL; par = nextTreeMap(moderadas))
+    {
+        musica *cancion = (musica *)par->value;
+        printf("%s - %.2f BPM", cancion->track_name, cancion->tempo);
+    }
+    printf("\n\nCanciones rapidas (> 120 BPM):\n");
+    for (Pair *par = firstTreeMap(rapidas); par != NULL; par = nextTreeMap(rapidas))
+    {
+        musica *cancion = (musica *)par->value;
+        printf("%s - %.2f BPM", cancion->track_name, cancion->tempo);
+    }
+}
 
 void agregar_favoritos(TreeMap *favoritos, TreeMap *canciones_id)
 {
@@ -238,16 +276,26 @@ void agregar_favoritos(TreeMap *favoritos, TreeMap *canciones_id)
         printf("No se encontro ninguna cancion con ese ID.\n");
         return;
     }
+
     musica *cancion = (musica *)par->value;
+
     printf("Ingresa la categoria de favoritos: ");
     scanf(" %[^\n]", categoria);
-    List *lista = (List *)searchTreeMap(favoritos, categoria);
-    if (lista == NULL)
+
+    Pair *par_fav = searchTreeMap(favoritos, categoria);
+    List *lista;
+
+    if (par_fav == NULL)
     {
         lista = createList();
         insertTreeMap(favoritos, strdup(categoria), lista);
     }
-    list_pushBack(lista, cancion);
+    else
+    {
+        lista = (List *)par_fav->value;
+    }
+
+    pushBack(lista, cancion);
     printf("Cancion agregada a favoritos en la categoria: %s\n", categoria);
 }
 
@@ -259,13 +307,16 @@ void mostrar_favoritos(TreeMap *favoritos)
         printf("No hay canciones en favoritos.\n");
         return;
     }
+
     while (par != NULL)
     {
-        char categoria = (char *)par->key;
+        char *categoria = (char *)par->key;
         List *lista = (List *)par->value;
-        printf("Categoria: %s\n", categoria);
-        musica *cancion = list_first(lista);
 
+        printf("\nCategoria: %s\n", categoria);
+        printf("--------------------------\n");
+
+        musica *cancion = firstList(lista);
         while (cancion != NULL)
         {
             printf("ID: %s\n", cancion->id);
@@ -274,11 +325,12 @@ void mostrar_favoritos(TreeMap *favoritos)
             printf("Nombre de la cancion: %s\n", cancion->track_name);
             printf("Genero: %s\n", cancion->track_genre);
             printf("Tempo: %.2f BPM\n", cancion->tempo);
+            printf("--------------------------\n");
+
             cancion = nextList(lista);
         }
         par = nextTreeMap(favoritos);
     }
-    
 }
 
 int main()
@@ -301,15 +353,15 @@ int main()
         switch(opcion) 
         {
             case '1':
-                system("cls");  // Limpia la pantalla (en Windows)
+                //system("cls");  // Limpia la pantalla (en Windows)
                 cargar_canciones(canciones_id, canciones_genero, canciones_artistas, tempo_lentas, tempo_Moderadas, tempo_rapidas);
                 break;
             case '2':
                 buscar_por_id(canciones_id);
                 break;
-            /*case '3':
+            case '3':
                 buscar_por_genero(canciones_genero);
-                break;*/
+                break;
             case '4':
                 buscar_por_artista(canciones_artistas);
                 break;
