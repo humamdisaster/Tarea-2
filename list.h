@@ -1,5 +1,5 @@
-#ifndef List_h
-#define List_h
+#ifndef LIST_h
+#define LIST_h
 
 typedef struct List List;
 
@@ -27,7 +27,7 @@ void * popCurrent(List * list);
 
 void cleanList(List * list);
 
-#endif /* List_h */
+
 
 // Esta función elimina el último elemento de la lista.
 void *list_popBack(List *L);
@@ -44,4 +44,4 @@ void list_sortedInsert(List *L, void *data,
 
 int list_size(List* L);
 
-#endif
+#endif /* LIST_h */

@@ -20,7 +20,7 @@ int lower_than_str(void* key1, void* key2){
 }
 
 int lower_than_float(void* key1, void* key2){
-    return *(float*)key1 < *(float*)key2;
+    return (float)key1 < (float)key2;
 }
 
 void mostrarMenu() {
@@ -186,7 +186,7 @@ void buscar_por_id(TreeMap *canciones_id)
 
     musica *cancion = (musica *)par->value;
 
-    /*imprime la informacion*/
+    /imprime la informacion/
     printf("\n--- Informacion de la cancion ---\n");
     printf("ID: %s\n", cancion->id);
     printf("Artista(s): %s\n", cancion->artists);
@@ -342,9 +342,9 @@ int leerOpcionValida() {
     char input[10];
     printf("\nIngrese la opcion (1-8): ");
     if (fgets(input, sizeof(input), stdin)) {
-        int opcion = atoi(input);
+        int opcion = atoi(input);  //convierte la cadena a entero
         if (opcion >= 1 && opcion <= 8) 
-        return opcion;
+            return opcion;
     }
     printf("Opcion no valida.\n");
     return -1;
@@ -373,8 +373,7 @@ int main()
 
         switch(opcion) {
             case 1:
-                cargar_canciones(canciones_id, canciones_genero, canciones_artistas,
-                               tempo_lentas, tempo_Moderadas, tempo_rapidas);
+                cargar_canciones(canciones_id, canciones_genero, canciones_artistas, tempo_lentas, tempo_Moderadas, tempo_rapidas);
                 break;
             case 2:
                 buscar_por_id(canciones_id);
