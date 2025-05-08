@@ -20,7 +20,7 @@ int lower_than_str(void* key1, void* key2){
 }
 
 int lower_than_float(void* key1, void* key2){
-    return (float)key1 < (float)key2;
+    return *(float*)key1 < *(float*)key2;
 }
 
 void mostrarMenu() {
@@ -186,7 +186,7 @@ void buscar_por_id(TreeMap *canciones_id)
 
     musica *cancion = (musica *)par->value;
 
-    /imprime la informacion/
+    //imprime la informacion
     printf("\n--- Informacion de la cancion ---\n");
     printf("ID: %s\n", cancion->id);
     printf("Artista(s): %s\n", cancion->artists);
