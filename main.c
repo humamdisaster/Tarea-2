@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include "treemap.h"
 #include "list.h"
 
@@ -22,8 +23,7 @@ int lower_than_float(void* key1, void* key2){
     return *(float*)key1 < *(float*)key2;
 }
 
-void mostrarMenu()
-{
+void mostrarMenu() {
     puts("========================================");
     puts("     Base de Datos de Canciones");
     puts("========================================");
@@ -35,6 +35,7 @@ void mostrarMenu()
     puts("6) Agregar a favoritos");
     puts("7) Mostrar favoritos");
     puts("8) Salir");
+    puts("========================================");
     fflush(stdout);
 }
 
@@ -198,8 +199,9 @@ void buscar_por_id(TreeMap *canciones_id)
 void buscar_por_genero(TreeMap *canciones_genero)
 {
     char genero_buscado[100];
-    printf("Ingrese el genero de la cancion: ");
+    printf("Ingrese el genero: ");
     scanf(" %[^\n]", genero_buscado);
+    getchar(); // Limpiar el buffer de entrada
 
     Pair *par = searchTreeMap(canciones_genero, genero_buscado);
     if (par == NULL)
@@ -230,6 +232,7 @@ void buscar_por_artista(TreeMap *canciones_artistas)
     char artista_buscado[100];
     printf("Ingrese el nombre del artista: ");
     scanf(" %[^\n]", artista_buscado);
+    getchar(); // Limpiar el buffer de entrada
 
     Pair *par = searchTreeMap(canciones_artistas, artista_buscado);
     if (par == NULL)
@@ -237,7 +240,7 @@ void buscar_por_artista(TreeMap *canciones_artistas)
         printf("No se encontro ninguna cancion de ese artista.\n");
         return;
     }
-    musica *cancion = (musica *)par->value;
+    musica *cancion = par->value;
     printf("Cancion encontrada: %s - %s\n", cancion->track_name, cancion->album_name);
 }
 
@@ -246,19 +249,19 @@ void buscar_por_tempo(TreeMap *lentas, TreeMap *moderadas, TreeMap *rapidas)
     printf("Canciones lentas (< 80 BPM):\n");
     for (Pair *par = firstTreeMap(lentas); par != NULL; par = nextTreeMap(lentas))
     {
-        musica *cancion = (musica *)par->value;
+        musica *cancion = par->value;
         printf("%s - %.2f BPM\n", cancion->track_name, cancion->tempo);
     }
     printf("\n\nCanciones moderadas (80 - 120 BPM):\n");
     for (Pair *par = firstTreeMap(moderadas); par != NULL; par = nextTreeMap(moderadas))
     {
-        musica *cancion = (musica *)par->value;
+        musica *cancion = par->value;
         printf("%s - %.2f BPM\n", cancion->track_name, cancion->tempo);
     }
     printf("\n\nCanciones rapidas (> 120 BPM):\n");
     for (Pair *par = firstTreeMap(rapidas); par != NULL; par = nextTreeMap(rapidas))
     {
-        musica *cancion = (musica *)par->value;
+        musica *cancion = par->value;
         printf("%s - %.2f BPM\n", cancion->track_name, cancion->tempo);
     }
 }
@@ -270,6 +273,7 @@ void agregar_favoritos(TreeMap *favoritos, TreeMap *canciones_id)
 
     printf("Ingresa el ID de la cancion: ");
     scanf(" %[^\n]", id);
+    getchar(); // Limpiar el buffer de entrada
 
     Pair *par = searchTreeMap(canciones_id, id);
     if (par == NULL)
@@ -278,10 +282,11 @@ void agregar_favoritos(TreeMap *favoritos, TreeMap *canciones_id)
         return;
     }
 
-    musica *cancion = (musica *)par->value;
+    musica *cancion = par->value;
 
     printf("Ingresa la categoria de favoritos: ");
     scanf(" %[^\n]", categoria);
+    getchar(); // Limpiar el buffer de entrada
 
     Pair *par_fav = searchTreeMap(favoritos, categoria);
     List *lista;
@@ -311,11 +316,10 @@ void mostrar_favoritos(TreeMap *favoritos)
 
     while (par != NULL)
     {
-        char *categoria = (char *)par->key;
-        List *lista = (List *)par->value;
 
-        printf("\nCategoria: %s\n", categoria);
+        printf("\nCategoria: %s\n", (char*)par->key);
         printf("--------------------------\n");
+        List *lista = par->value;
 
         musica *cancion = firstList(lista);
         while (cancion != NULL)
@@ -334,9 +338,21 @@ void mostrar_favoritos(TreeMap *favoritos)
     }
 }
 
+int leerOpcionValida() {
+    char input[10];
+    printf("\nIngrese la opcion (1-8): ");
+    if (fgets(input, sizeof(input), stdin)) {
+        int opcion = atoi(input);
+        if (opcion >= 1 && opcion <= 8) 
+        return opcion;
+    }
+    printf("Opcion no valida.\n");
+    return -1;
+}
+
 int main()
 {
-    char opcion[10];
+    int opcion;
     TreeMap *canciones_id = createTreeMap(lower_than_str); //mapa de ID
     TreeMap *canciones_genero = createTreeMap(lower_than_str); //mapa de genero
     TreeMap *canciones_artistas = createTreeMap(lower_than_str); //mapa de artistas
@@ -345,58 +361,50 @@ int main()
     TreeMap *tempo_rapidas = createTreeMap(lower_than_float); //mapa de tempo canciones rapidas
     TreeMap *favoritos = createTreeMap(lower_than_str); //mapa de favoritos
 
-    do
-    {
+    do {
         mostrarMenu();
-        printf("Ingrese la opcion: ");
-
-        if (fgets(opcion, sizeof(opcion), stdin == NULL))
-        {
-            printf("Error al leer la opcion.\n");
+        opcion = leerOpcionValida();
+        
+        if (opcion == -1) {
+            printf("Presione Enter para continuar...");
+            while (getchar() != '\n');
             continue;
         }
-        if (strchr(opcion, '\n') == NULL){
-            int c;
-            while ((c = getchar()) != '\n' && c != EOF); // Limpiar el buffer
-        }
 
-        switch(opcion[0]) 
-        {
-            case '1':
-                //system("cls");  // Limpia la pantalla (en Windows)
-                cargar_canciones(canciones_id, canciones_genero, canciones_artistas, tempo_lentas, tempo_Moderadas, tempo_rapidas);
+        switch(opcion) {
+            case 1:
+                cargar_canciones(canciones_id, canciones_genero, canciones_artistas,
+                               tempo_lentas, tempo_Moderadas, tempo_rapidas);
                 break;
-            case '2':
+            case 2:
                 buscar_por_id(canciones_id);
                 break;
-            case '3':
+            case 3:
                 buscar_por_genero(canciones_genero);
                 break;
-            case '4':
+            case 4:
                 buscar_por_artista(canciones_artistas);
                 break;
-            case '5':
+            case 5:
                 buscar_por_tempo(tempo_lentas, tempo_Moderadas, tempo_rapidas);
                 break;
-            case '6':
+            case 6:
                 agregar_favoritos(favoritos, canciones_id);
                 break;
-            case '7':
+            case 7:
                 mostrar_favoritos(favoritos);
                 break;
-            case '8':
-                printf("Saliendo...\n");
-                break;
-            default:
-                printf("Opción no válida. Por favor, intente de nuevo.\n");
+            case 8:
+                printf("Saliendo del sistema...\n");
                 break;
         }
-        if (opcion[0] != '8')
-        {
+        
+        if (opcion != 8) {
             printf("\nPresione Enter para continuar...");
             while (getchar() != '\n');
         }
-    } while(opcion[0] != '8');
+        
+    } while(opcion != 8);
 
     return 0;
 }
