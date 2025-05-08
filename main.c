@@ -35,6 +35,7 @@ void mostrarMenu()
     puts("6) Agregar a favoritos");
     puts("7) Mostrar favoritos");
     puts("8) Salir");
+    fflush(stdout);
 }
 
 char **leer_linea_csv(FILE *archivo, char delimitador) 
@@ -117,7 +118,7 @@ void cargar_canciones(TreeMap *canciones_id, TreeMap *canciones_genero, TreeMap 
         musica *cancion = malloc(sizeof(musica));
         if (cancion == NULL) 
         {
-            perror("Error al asignar memoria a musica");
+            perror("Error al asignar memoria a musica, por favor intente nuevamente");
             exit(EXIT_FAILURE);
         }
 
@@ -246,19 +247,19 @@ void buscar_por_tempo(TreeMap *lentas, TreeMap *moderadas, TreeMap *rapidas)
     for (Pair *par = firstTreeMap(lentas); par != NULL; par = nextTreeMap(lentas))
     {
         musica *cancion = (musica *)par->value;
-        printf("%s - %.2f BPM", cancion->track_name, cancion->tempo);
+        printf("%s - %.2f BPM\n", cancion->track_name, cancion->tempo);
     }
     printf("\n\nCanciones moderadas (80 - 120 BPM):\n");
     for (Pair *par = firstTreeMap(moderadas); par != NULL; par = nextTreeMap(moderadas))
     {
         musica *cancion = (musica *)par->value;
-        printf("%s - %.2f BPM", cancion->track_name, cancion->tempo);
+        printf("%s - %.2f BPM\n", cancion->track_name, cancion->tempo);
     }
     printf("\n\nCanciones rapidas (> 120 BPM):\n");
     for (Pair *par = firstTreeMap(rapidas); par != NULL; par = nextTreeMap(rapidas))
     {
         musica *cancion = (musica *)par->value;
-        printf("%s - %.2f BPM", cancion->track_name, cancion->tempo);
+        printf("%s - %.2f BPM\n", cancion->track_name, cancion->tempo);
     }
 }
 
@@ -335,7 +336,7 @@ void mostrar_favoritos(TreeMap *favoritos)
 
 int main()
 {
-    char opcion;
+    char opcion[10];
     TreeMap *canciones_id = createTreeMap(lower_than_str); //mapa de ID
     TreeMap *canciones_genero = createTreeMap(lower_than_str); //mapa de genero
     TreeMap *canciones_artistas = createTreeMap(lower_than_str); //mapa de artistas
@@ -348,9 +349,18 @@ int main()
     {
         mostrarMenu();
         printf("Ingrese la opcion: ");
-        scanf(" %c", &opcion);
 
-        switch(opcion) 
+        if (fgets(opcion, sizeof(opcion), stdin == NULL))
+        {
+            printf("Error al leer la opcion.\n");
+            continue;
+        }
+        if (strchr(opcion, '\n') == NULL){
+            int c;
+            while ((c = getchar()) != '\n' && c != EOF); // Limpiar el buffer
+        }
+
+        switch(opcion[0]) 
         {
             case '1':
                 //system("cls");  // Limpia la pantalla (en Windows)
@@ -374,12 +384,19 @@ int main()
             case '7':
                 mostrar_favoritos(favoritos);
                 break;
+            case '8':
+                printf("Saliendo...\n");
+                break;
             default:
-                if (opcion != '8') printf("Opcion no valida.\n");
+                printf("Opción no válida. Por favor, intente de nuevo.\n");
                 break;
         }
-    } while(opcion != '8');
-    printf("Saliendo...\n");
+        if (opcion[0] != '8')
+        {
+            printf("\nPresione Enter para continuar...");
+            while (getchar() != '\n');
+        }
+    } while(opcion[0] != '8');
 
     return 0;
 }
