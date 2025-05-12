@@ -67,7 +67,7 @@ Tempo: 105.19 BPM
 Presione Enter para continuar...
 
 
-** Problemas conocidos
+## Problemas conocidos
 - Liberación de memoria: Ocasionalmente ocurre un segmentation fault al salir del programa.
 
 
