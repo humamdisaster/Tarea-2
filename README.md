@@ -31,7 +31,7 @@ Este programa en permite gestionar una base de datos de canciones a partir de un
 1. Compila el programa con:
    ```bash
    gcc -o canciones main.c treemap.c list.c
-2. Ejecutar el programa con 
+2. Ejecutar el programa con:
     ```bash
     ./canciones
 
